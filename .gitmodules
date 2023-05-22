@@ -1,0 +1,3 @@
+[submodule "lib/JsonLD"]
+	path = lib/JsonLD
+	url = git@github.com:lanthaler/JsonLD.git
