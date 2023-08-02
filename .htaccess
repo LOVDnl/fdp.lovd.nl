@@ -1,0 +1,13 @@
+# Requires AllowOverride Options
+php_flag register_globals Off
+php_flag magic_quotes_gpc Off
+php_flag mysql.trace_mode Off
+
+# We rely on RewriteEngine to send all communication to index.php.
+# Requires AllowOverride FileInfo
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php
+</IfModule>
