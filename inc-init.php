@@ -72,7 +72,7 @@ function lovd_API_handleError ($nError, $sError, $sFile, $nLine)
             break;
     }
 
-    header('HTTP/1.0 500 Internal Server Error', true, 500);
+    header('Content-type: application/json; charset=UTF-8', true, 500);
     die(json_encode($aReturn, JSON_PRETTY_PRINT));
 }
 set_error_handler('lovd_API_handleError');
@@ -128,7 +128,7 @@ if ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PR
 $_SERVER['SCRIPT_NAME'] = lovd_cleanDirName(str_replace('\\', '/', $_SERVER['SCRIPT_NAME']));
 
 // Our output formats: application/json by default.
-$aFormats = array('application/json', 'text/turtle'); // Key [0] is default.
+$aFormats = array('application/ld+json', 'text/turtle'); // Key [0] is default.
 if (!empty($_GET['format']) && in_array($_GET['format'], $aFormats)) {
     define('FORMAT', $_GET['format']);
 } else {
