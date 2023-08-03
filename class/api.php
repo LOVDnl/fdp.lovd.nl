@@ -457,10 +457,12 @@ class LOVD_API
 
         // Response header...
         header('HTTP/1.0 ' . $nStatus, true, $nStatus);
+
         // Add the Location header, if needed.
         if ($nStatus == 302 && substr($this->aResponse['messages'][0], 0, 9) == 'Location:') {
             header($this->aResponse['messages'][0]);
         }
+
         // Add the WWW-Authenticate header, if needed.
         if ($nStatus == 401) {
             header('WWW-Authenticate: ' .
@@ -472,14 +474,19 @@ class LOVD_API
                 ($this->sResource == 'submissions' || !in_array('Authorization', array_keys(getallheaders()))? '' : ', error="invalid_token"')
             );
         }
+
         // Add the Allow header, if needed.
         if ($nStatus == 405 && $this->sResource && isset($this->aResourcesSupported[$this->sResource])) {
             header('Allow: ' . implode(', ', $this->aResourcesSupported[$this->sResource]));
         }
-        // Content type...
-        // Force this on application/json, since we could have sent another content-type earlier,
-        //  but we normally use this function for errors, so JSON will follow.
-        header('Content-type: application/json; charset=UTF-8');
+
+        // Content type... but override in case of errors.
+        if (!HEAD && $nStatus >= 400) {
+            // Errors, and we'll display output. So, we'll display JSON for sure.
+            $this->sFormatOutput = 'application/json';
+        }
+        header('Content-type: ' . $this->sFormatOutput . '; charset=UTF-8');
+
         // Other headers...
         foreach ($this->aHTTPHeaders as $sHeader => $sContent) {
             header($sHeader . ': ' . $sContent);
