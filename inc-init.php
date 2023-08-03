@@ -5,7 +5,7 @@
  * Adapted from /src/inc-init.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-02
+ * Modified    : 2023-08-03   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -127,15 +127,14 @@ if ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PR
 // Prevent some troubles with the menu or lovd_getProjectFile() when the URL contains double slashes or backslashes.
 $_SERVER['SCRIPT_NAME'] = lovd_cleanDirName(str_replace('\\', '/', $_SERVER['SCRIPT_NAME']));
 
-// Our output formats: application/json by default.
+// Our output formats: application/ld+json by default.
 $aFormats = array('application/ld+json', 'text/turtle'); // Key [0] is default.
 if (!empty($_GET['format']) && in_array($_GET['format'], $aFormats)) {
     define('FORMAT', $_GET['format']);
 } else {
-    define('FORMAT', $aFormats[0]);
+    // Don't enforce a default, so the API object will check the headers.
+    define('FORMAT', '');
 }
-// @ is to suppress errors in Travis test.
-@header('Content-type: ' . FORMAT . '; charset=UTF-8');
 
 
 

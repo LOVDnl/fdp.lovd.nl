@@ -103,6 +103,11 @@ class LOVD_API
             }
         }
 
+        // Actually, let a direct request in the URL override anything else.
+        if (FORMAT && in_array(FORMAT, $this->aFormatsAccepted)) {
+            $aAccepts = array(FORMAT);
+        }
+
         if (!$aAccepts && $sAcceptsRaw) {
             // Client requested a format, but all formats requested are rejected
             //  and client didn't add */* as an option. So, we complain.
