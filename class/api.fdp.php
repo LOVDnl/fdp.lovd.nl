@@ -110,7 +110,57 @@ class LOVD_API_FDP
             return true;
         }
 
-        $this->API->aResponse = array();
+        // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
+        $this->API->aResponse = [
+            // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
+            // In this case, the FDP node and the catalogs node.
+            '@graph' => [
+                [
+                    '@id' => lovd_getInstallURL(),
+                    '@type' => 'http://purl.org/fdp/fdp-o#FAIRDataPoint',
+                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) FAIR Data Point (FDP)',
+                    'http://purl.org/dc/terms/description' => 'This FAIR Data Point lists public LOVD instances and some of their metadata.',
+                    'http://purl.org/dc/terms/publisher' => [
+                        '@id' => lovd_getInstallURL() . '#publisher',
+                        '@type' => 'http://xmlns.com/foaf/0.1/Agent',
+                        'http://xmlns.com/foaf/0.1/name' => 'Leiden Open Variation Database',
+                        'http://xmlns.com/foaf/0.1/homepage' => 'https://lovd.nl',
+                    ],
+                    'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+                    'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
+                    'http://www.w3.org/ns/dcat#contactPoint' => [
+                        '@id' => lovd_getInstallURL() . '#contactPoint',
+                        '@type' => 'http://www.w3.org/2006/vcard/ns#VCard',
+                        'http://www.w3.org/2006/vcard/ns#fn' => 'LOVD team',
+                        'http://www.w3.org/2006/vcard/ns#hasEmail' => 'LOVD@LOVD.nl',
+                        'http://www.w3.org/2006/vcard/ns#hasURL' => 'https://lovd.nl/contact',
+                    ],
+                    'http://www.w3.org/ns/dcat#endpointURL' => lovd_getInstallURL(),
+                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . '#identifier',
+                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => '2023-08-03T15:38:19+02:00',
+                    ],
+                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => date('c'),
+                    ],
+                    'http://purl.org/fdp/fdp-o#hasSoftwareVersion' => $this->API->aResponse['library_version'],
+                    'http://purl.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/',
+                    'http://purl.org/fdp/fdp-o#metadataCatalog' => [
+                    ],
+                ],
+                [
+                    '@id' => lovd_getInstallURL() . 'catalogs/',
+                    '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
+                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) Catalogs',
+                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL(),
+                    'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://purl.org/fdp/fdp-o#metadataCatalog',
+                    'http://www.w3.org/ns/ldp#contains' => [
+                    ],
+                ],
+            ],
+        ];
         return true;
     }
 }
