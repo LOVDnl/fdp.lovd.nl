@@ -95,5 +95,23 @@ class LOVD_API_FDP
         // If we end up here, we didn't handle the request well.
         return false;
     }
+
+
+
+
+
+    private function showFDP ()
+    {
+        // Shows the FDP output.
+
+        // For HEAD requests, we're done here.
+        if (!$this->bReturnBody) {
+            $this->API->sendHeader(200, true); // Send HTTP status code, print response, and quit.
+            return true;
+        }
+
+        $this->API->aResponse = array();
+        return true;
+    }
 }
 ?>
