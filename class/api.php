@@ -5,7 +5,7 @@
  * Adapted from /src/class/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-02
+ * Modified    : 2023-08-03   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -61,6 +61,7 @@ class LOVD_API
 
     // Currently supported resources (resource => array(methods)):
     private $aResourcesSupported = array(
+        '' => array('GET', 'HEAD'),
     );
 
     // Currently supported output formats that can be requested:
@@ -398,7 +399,7 @@ class LOVD_API
         // Processes the GET calls to the API.
 
         if ($this->sResource == '') {
-            require_once 'class/api.FDP.php';
+            require_once 'class/api.fdp.php';
             $o = new LOVD_API_FDP($this);
         } elseif ($this->sResource == 'ga4gh') {
             require_once 'class/api.ga4gh.php';
