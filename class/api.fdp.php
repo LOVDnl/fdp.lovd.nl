@@ -40,6 +40,7 @@ class LOVD_API_FDP
     // This class defines the LOVD API object handling the FDP.
 
     private $API;                     // The API object.
+    private $bReturnBody = true;      // Return the body? false for HEAD requests.
 
 
 
@@ -56,6 +57,43 @@ class LOVD_API_FDP
         $this->API->aResponse['library_version'] = '2023-08-03';
 
         return true;
+    }
+
+
+
+
+
+    public function processGET ($aURLElements, $bReturnBody)
+    {
+        // Handle GET and HEAD requests for the FDP.
+        // For HEAD requests, we won't print any output.
+        // We could just check for the HEAD constant but this way the code will
+        //  be more independent on the rest of the infrastructure.
+        // Note that LOVD API's sendHeaders() function does check for HEAD and
+        //  automatically won't print any contents if HEAD is used.
+        $this->bReturnBody = $bReturnBody;
+
+        if (is_array($aURLElements)) {
+            // Strip the padded elements off.
+            $aURLElements = array_diff($aURLElements, array(''));
+        }
+
+        // Check URL structure.
+        if (!is_array($aURLElements)) {
+            // Something invalid happened.
+            $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
+            $this->API->aResponse['errors'][] = 'Could not parse the given request.';
+            return false;
+        }
+
+        // Now actually handle the request.
+        // We receive all FDP endpoints here.
+        if (!$this->API->sResource) {
+            return $this->showFDP();
+        }
+
+        // If we end up here, we didn't handle the request well.
+        return false;
     }
 }
 ?>
