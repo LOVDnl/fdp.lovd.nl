@@ -77,10 +77,10 @@ class LOVD_API
 
     // Currently supported output formats that can be requested:
     private $aFormatsAccepted = array(
-        'application/ld+json',
-        'application/*',
         'text/turtle',
         'text/*',
+        'application/ld+json',
+        'application/*',
         '*/*',
     );
 
