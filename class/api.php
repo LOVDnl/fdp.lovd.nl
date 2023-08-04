@@ -383,6 +383,19 @@ class LOVD_API
                     $sResponse .= "\n";
                 }
             }
+
+        } elseif ($this->sFormatOutput == 'application/ld+json') {
+            // We received a more compact array than JSON-LD requires, so convert it.
+            $this->aResponse = $this->convertDataToJSONLD($this->aResponse);
+
+            $bPrettyPrint = (PHP_VERSION_ID >= 50400
+                && memory_get_usage() < 10000000);
+            $bUnescapedSlashes = (PHP_VERSION_ID >= 50400);
+            $sResponse = json_encode(
+                $this->aResponse,
+                ($bPrettyPrint? JSON_PRETTY_PRINT : 0) | ($bUnescapedSlashes? JSON_UNESCAPED_SLASHES : 0)
+            );
+
         } else {
             // Default: application/json.
             $bPrettyPrint = (PHP_VERSION_ID >= 50400

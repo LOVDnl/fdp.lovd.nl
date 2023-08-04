@@ -5,8 +5,11 @@
  * Adapted from /src/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-02
+ * Modified    : 2023-08-02   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
+ *
+ * Supported URIs (/v# is optional):
+ *  3.0-29 (v1)  /v#/               (GET/HEAD)
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
  * Programmer  : Ivo F.A.C. Fokkema <I.F.A.C.Fokkema@LUMC.nl>
