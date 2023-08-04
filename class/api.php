@@ -5,7 +5,7 @@
  * Adapted from /src/class/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-03   // When modified, also change the library_version.
+ * Modified    : 2023-08-04   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -301,6 +301,58 @@ class LOVD_API
                 $this->sendHeader(500, true); // Send 500 Internal Server Error, print response, and quit.
             }
         }
+    }
+
+
+
+
+
+    private function convertDataToJSONLD ($aResponse) :array
+    {
+        // Converts a compact data array into much more verbose JSON-LD format.
+        // This function will still return an array, not an actually formatted JSON string.
+
+        if (!is_array($aResponse)) {
+            // Consider it an ID.
+            return ['@id' => $aResponse];
+        }
+
+        foreach ($aResponse as $Key => $Value) {
+            if (is_array($Value)) {
+                if ($Key == '@type') {
+                    // A list of @types. We won't touch this.
+                    continue;
+
+                } elseif ($Key == '@graph' || isset($Value[0])) {
+                    // Either the main @graph (a list of nodes), or a list of IDs.
+                    // Just convert the entries, leave the overall structure.
+                    $aResponse[$Key] = array_map([$this, 'convertDataToJSONLD'], $Value);
+
+                } elseif (count($Value)) {
+                    // Keys have values, so consider this a node. Nest in a deeper layer, and convert.
+                    $aResponse[$Key] = array_map([$this, 'convertDataToJSONLD'], [$Value]);
+                }
+
+            } elseif ($Key[0] == '@') {
+                // These we'll leave as is.
+                // @id, @language, @type, @value...
+
+            } else {
+                // Other edges. Since we handled arrays already, we assume these are strings.
+                // When it's a simple string, we should expand it and either assign an @id or @value to it.
+                // It seems completely arbitrary when something should be an @id or a @value.
+                // I haven't found any documentation on it, but I don't think we can predict it.
+                // Either way, URLs can still be @values so aren't always @ids. Still, this will be our focus.
+                if (substr($Value, 0, 4) == 'http' && strpos($Key, 'hasURL') === false) {
+                    $sType = '@id';
+                } else {
+                    $sType = '@value';
+                }
+                $aResponse[$Key] = [[$sType => $Value]];
+            }
+        }
+
+        return $aResponse;
     }
 
 
