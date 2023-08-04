@@ -90,6 +90,9 @@ class LOVD_API_FDP
         // We receive all FDP endpoints here.
         if (!$this->API->sResource) {
             return $this->showFDP();
+        } elseif ($this->API->sResource == 'catalogs') {
+            // Return just the catalogs; unset the FAIRDataPoint data.
+            return ($this->showFDP() && array_shift($this->API->aResponse['@graph']));
         }
 
         // If we end up here, we didn't handle the request well.

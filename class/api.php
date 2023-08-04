@@ -73,6 +73,7 @@ class LOVD_API
     // Currently supported resources (resource => array(methods)):
     private $aResourcesSupported = array(
         '' => array('GET', 'HEAD'),
+        'catalogs' => array('GET', 'HEAD'),
     );
 
     // Currently supported output formats that can be requested:
@@ -487,7 +488,7 @@ class LOVD_API
     {
         // Processes the GET calls to the API.
 
-        if ($this->sResource == '') {
+        if (in_array($this->sResource, array('', 'catalogs'))) {
             require_once 'class/api.fdp.php';
             $o = new LOVD_API_FDP($this);
         } elseif ($this->sResource == 'ga4gh') {
