@@ -34,6 +34,17 @@ if (!defined('ROOT_PATH')) {
     exit;
 }
 
+// Required for the JSON-LD library.
+spl_autoload_register(
+    function ($sClass) {
+        if (strpos($sClass, 'ML\\') === 0) {
+            $sPath = implode('/', array_slice(explode('\\', $sClass), 1)) . '.php';
+            require_once ROOT_PATH . 'lib/' . $sPath;
+            return true;
+        }
+    }
+);
+
 
 
 class LOVD_API
@@ -395,6 +406,14 @@ class LOVD_API
                 $this->aResponse,
                 ($bPrettyPrint? JSON_PRETTY_PRINT : 0) | ($bUnescapedSlashes? JSON_UNESCAPED_SLASHES : 0)
             );
+
+        } elseif ($this->sFormatOutput == 'text/turtle') {
+            // We received a more compact array than JSON-LD requires, so convert it.
+            $this->aResponse = $this->convertDataToJSONLD($this->aResponse);
+
+            $oQuads = \ML\JsonLD\JsonLD::toRdf(json_encode($this->aResponse));
+            $oNQuads = new \ML\JsonLD\NQuads();
+            $sResponse = $oNQuads->serialize($oQuads);
 
         } else {
             // Default: application/json.
