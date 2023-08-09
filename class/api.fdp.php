@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-04   // When modified, also change the library_version.
+ * Modified    : 2023-08-09   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -54,7 +54,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-04';
+        $this->API->aResponse['library_version'] = '2023-08-09';
 
         return true;
     }
@@ -79,7 +79,9 @@ class LOVD_API_FDP
         }
 
         // Check URL structure.
-        if (!is_array($aURLElements)) {
+        if (!is_array($aURLElements)
+            || ($this->API->sResource == 'catalog' && count($aURLElements) != 1)
+            || ($this->API->sResource != 'catalog' && $aURLElements)) {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
             $this->API->aResponse['errors'][] = 'Could not parse the given request.';
@@ -93,6 +95,9 @@ class LOVD_API_FDP
         } elseif ($this->API->sResource == 'catalogs') {
             // Return just the catalogs; unset the FAIRDataPoint data.
             return ($this->showFDP() && array_shift($this->API->aResponse['@graph']));
+        } elseif ($this->API->sResource == 'catalog') {
+            // Return just one catalog, possibly containing datasets or distributions.
+            return $this->showFDPCatalog($aURLElements[0]);
         }
 
         // If we end up here, we didn't handle the request well.
