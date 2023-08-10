@@ -5,7 +5,7 @@
  * Adapted from /src/class/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-09   // When modified, also change the library_version.
+ * Modified    : 2023-08-10   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -413,9 +413,79 @@ class LOVD_API
             // We received a more compact array than JSON-LD requires, so convert it.
             $this->aResponse = $this->convertDataToJSONLD($this->aResponse);
 
-            $oQuads = \ML\JsonLD\JsonLD::toRdf(json_encode($this->aResponse));
-            $oNQuads = new \ML\JsonLD\NQuads();
-            $sResponse = $oNQuads->serialize($oQuads);
+            // OK, I was using https://github.com/lanthaler/JsonLD here, but it's too slow. When trying to handle 8000
+            //  datasets for one catalog (i.e., 8000 genes in an LOVD), it takes almost 30 seconds to parse the RDF.
+            //  Obviously, it wouldn't need to parse the RDF if I would be able to just, in a more direct way, import
+            //  the JSON-LD that I'm generating, but so be it. Using this library, I wouldn't be able to include the GV
+            //  shared (over 22K genes) in the FDP.
+            //    $oQuads = \ML\JsonLD\JsonLD::toRdf(json_encode($this->aResponse)); // Takes too much time.
+            //    $oNQuads = new \ML\JsonLD\NQuads();
+            //    $sResponse = $oNQuads->serialize($oQuads);
+            // So, decided to serialize the JSON-LD to TTL myself. Now, I could simplify my life by taking my own data
+            //  array (not JSON-LD), but in case this code proves useful, I'd rather have a JSON-LD to TTL converter
+            //  than a random array to TTL converter. However, this code is still quite specific for our JSON-LD.
+            // With this code, the conversion with 8000 datasets takes <1 second.
+            $sResponse = '';
+            $aGraphs = &$this->aResponse['@graph'];
+            for ($nKey = 0; $nKey < count($aGraphs); $nKey ++) {
+                // Doing this in a for-loop rather than a foreach, because we're modifying $aGraphs.
+                $aGraph = $aGraphs[$nKey];
+
+                // Two fields that we have to handle separately.
+                $sID = $aGraph['@id'];
+                $sType = $aGraph['@type']; // We assume that @type is a string, not an array.
+                unset($aGraph['@id'], $aGraph['@type']);
+                $sResponse .= (!$nKey? '' : "\n") .
+                    ($sID[0] == '_'? $sID : '<' . $sID . '>') .
+                    ' a <' . $sType . '>;' . "\n";
+
+                // Now handle the rest.
+                foreach ($aGraph as $sProperty => $Value) {
+                    $sResponse .= '  ' .
+                        (substr(strstr($sProperty, ':'), 0, 3) != '://'? $sProperty : '<' . $sProperty . '>') .
+                        ' ';
+                    // We should be expecting only arrays, but just in case.
+                    if (!is_array($Value)) {
+                        // Escape value properly.
+                        $sResponse .= (substr(strstr($Value, ':'), 0, 3) != '://'? '"' . addslashes($Value) . '"' : '<' . $Value . '>');
+                    }
+
+                    foreach ($Value as $Key => $Object) {
+                        // Values are typically arrays, but often with only one value.
+                        if (is_array($Object)) {
+                            if (count($Object) == 1) {
+                                // Just one item. Translate into an ID or a value.
+                                $Value[$Key] = (key($Object) == '@id'? '<' . current($Object) . '>' : '"' . addslashes(current($Object)) . '"');
+                            } elseif (count($Object) == 2 && array_diff(array_keys($Object), ['@type', '@value']) == []) {
+                                // Two items, a value and a type.
+                                $Value[$Key] = '"' . addslashes($Object['@value']) . '"';
+                                if ($Object['@type'] != 'https://www.w3.org/2001/XMLSchema#string') {
+                                    $Value[$Key] .= '^^<' . $Object['@type'] . '>';
+                                }
+
+                            } else {
+                                // This is an object. If there is an @id, we'll handle it elsewhere.
+                                if (isset($Object['@id'])) {
+                                    // We'll handle this elsewhere. Just keep the reference, move the object.
+                                    array_splice($aGraphs, $nKey + 1, 0, [$Object]);
+                                    $Value[$Key] = '<' . $Object['@id'] . '>';
+                                } else {
+                                    // FIXME: STUB. Obviously, to be a real JSON-LD to TTL converter, I'd need a
+                                    //  recursive call here. But, we're not a function and currently, I don't need this
+                                    //  functionality.
+                                }
+                            }
+                        }
+                    }
+                    $sResponse .= implode(
+                        ",\n    ",
+                        $Value
+                    ) . ";\n";
+                }
+
+                // Finalize this subject.
+                $sResponse = substr_replace($sResponse, " .\n", -2);
+            }
 
         } else {
             // Default: application/json.
