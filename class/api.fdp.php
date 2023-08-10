@@ -189,5 +189,70 @@ class LOVD_API_FDP
 
         return true;
     }
+
+
+
+
+
+    private function showFDPCatalog ($sUUID)
+    {
+        // Shows one of the FDP's catalogs.
+
+        // First, check if the LOVD exist.
+        if (!isset($this->aLOVDs[$sUUID])) {
+            // LOVD does not exist.
+            $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
+            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // For HEAD requests, we're done here.
+        if (!$this->bReturnBody) {
+            $this->API->sendHeader(200, true); // Send HTTP status code, print response, and quit.
+            return true;
+        }
+
+        // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
+        $this->API->aResponse = [
+            // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
+            // In this case, the FDP node and the catalogs node.
+            '@graph' => [
+                [
+                    '@id' => lovd_getInstallURL() . CURRENT_PATH,
+                    '@type' => 'http://www.w3.org/ns/dcat#Catalog',
+                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) instance',
+                    'http://purl.org/dc/terms/description' => 'This catalog lists the metadata for the public LOVD instance.',
+                    'http://purl.org/dc/terms/publisher' => [
+                        '@id' => lovd_getInstallURL() . '#publisher',
+                        '@type' => 'http://xmlns.com/foaf/0.1/Agent',
+                        'http://xmlns.com/foaf/0.1/name' => 'Leiden Open Variation Database',
+                        'http://xmlns.com/foaf/0.1/homepage' => 'https://lovd.nl',
+                    ],
+                    'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+                    'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
+                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL(),
+                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
+                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => '2023-08-03T15:38:19+02:00',
+                    ],
+                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => date('c'), // FIXME: Measure from Varcache tables?
+                    ],
+                    'http://www.w3.org/ns/dcat#dataset' => [],
+                ],
+                [
+                    '@id' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/datasets',
+                    '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
+                    'http://purl.org/dc/terms/title' => 'Datasets',
+                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa'),
+                    'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://www.w3.org/ns/dcat#dataset',
+                    'http://www.w3.org/ns/ldp#contains' => [],
+                ],
+            ],
+        ];
+
+        return true;
+    }
 }
 ?>
