@@ -491,6 +491,32 @@ class LOVD_API
 
 
 
+    public function generateUUIDFromLOVDID ($sLOVDID)
+    {
+        // Generates UUIDs based on a given LOVD ID (an MD5 hash).
+
+        if (!$sLOVDID || !is_string($sLOVDID) || strlen($sLOVDID) != 32) {
+            return false;
+        }
+
+        // Decided to not generate real UUIDs. It's not actually a requirement of the FDP specs, and I won't generate
+        //  real UUIDs for the datasets or their distributions, either. Otherwise, we'd need to cache the UUIDs so we
+        //  could look them up, and it has no benefits since anyway we'd just still be working with the gene symbols.
+        // So, this function simulates creating a UUID, by simply reformatting an MD5 hash into a UUID-like string.
+
+        // Cache the output of this function.
+        static $aIDs = array();
+        if (!isset($aIDs[$sLOVDID])) {
+            $aIDs[$sLOVDID] = substr($sLOVDID, 0, 8) . '-' . substr($sLOVDID, 8, 4) . '-' . substr($sLOVDID, 12, 4) . '-' . substr($sLOVDID, 16, 4) . '-' . substr($sLOVDID, 20);
+        }
+
+        return $aIDs[$sLOVDID];
+    }
+
+
+
+
+
     public function jsonDecode ($sInput)
     {
         // Attempts to decode the given JSON string, and handles any error.
