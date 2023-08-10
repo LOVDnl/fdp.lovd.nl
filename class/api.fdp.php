@@ -269,6 +269,11 @@ class LOVD_API_FDP
             ],
         ];
 
+        foreach ($aLOVD['genes'] as $sGene) {
+            $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#dataset'][] = lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene;
+        }
+        $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#dataset'];
+
         return true;
     }
 }
