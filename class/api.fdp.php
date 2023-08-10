@@ -102,6 +102,9 @@ class LOVD_API_FDP
         } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 1) {
             // Return just one catalog, possibly containing datasets or distributions.
             return $this->showFDPCatalog($aURLElements[0]);
+        } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 2 && $aURLElements[1] == 'datasets') {
+            // Return just the catalog's datasets; unset the catalog data.
+            return ($this->showFDPCatalog($aURLElements[0]) && array_shift($this->API->aResponse['@graph']));
         } else {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
