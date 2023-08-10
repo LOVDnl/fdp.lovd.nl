@@ -1,6 +1,0 @@
-[submodule "lib/JsonLD"]
-	path = lib/JsonLD
-	url = git@github.com:lanthaler/JsonLD.git
-[submodule "lib/IRI"]
-	path = lib/IRI
-	url = git@github.com:lanthaler/IRI.git
