@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-09   // When modified, also change the library_version.
+ * Modified    : 2023-08-10   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -41,6 +41,7 @@ class LOVD_API_FDP
 
     private $API;                     // The API object.
     private $bReturnBody = true;      // Return the body? false for HEAD requests.
+    private $aLOVDs = array();
 
 
 
@@ -54,7 +55,20 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-09';
+        $this->API->aResponse['library_version'] = '2023-08-10';
+
+        // Fetch the LOVD data.
+        // Currently, we just have a fixed list of LSDB IDs that we include here.
+        $aLOVDs = array(
+            '53786324d4c6cf1d33a3e594a92591aa',
+        );
+        $this->aLOVDs = array_combine(
+            array_map(
+                [$this->API, 'generateUUIDFromLOVDID'],
+                $aLOVDs
+            ),
+            $aLOVDs
+        );
 
         return true;
     }
@@ -155,8 +169,7 @@ class LOVD_API_FDP
                     ],
                     'http://purl.org/fdp/fdp-o#hasSoftwareVersion' => $this->API->aResponse['library_version'],
                     'http://purl.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/',
-                    'http://purl.org/fdp/fdp-o#metadataCatalog' => [
-                    ],
+                    'http://purl.org/fdp/fdp-o#metadataCatalog' => [],
                 ],
                 [
                     '@id' => lovd_getInstallURL() . 'catalogs/',
@@ -164,11 +177,16 @@ class LOVD_API_FDP
                     'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) Catalogs',
                     'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL(),
                     'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://purl.org/fdp/fdp-o#metadataCatalog',
-                    'http://www.w3.org/ns/ldp#contains' => [
-                    ],
+                    'http://www.w3.org/ns/ldp#contains' => [],
                 ],
             ],
         ];
+
+        foreach (array_keys($this->aLOVDs) as $sUUID) {
+            $this->API->aResponse['@graph'][0]['http://purl.org/fdp/fdp-o#metadataCatalog'][] = lovd_getInstallURL() . 'catalog/' . $sUUID;
+        }
+        $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://purl.org/fdp/fdp-o#metadataCatalog'];
+
         return true;
     }
 }
