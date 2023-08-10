@@ -34,17 +34,6 @@ if (!defined('ROOT_PATH')) {
     exit;
 }
 
-// Required for the JSON-LD library.
-spl_autoload_register(
-    function ($sClass) {
-        if (strpos($sClass, 'ML\\') === 0) {
-            $sPath = implode('/', array_slice(explode('\\', $sClass), 1)) . '.php';
-            require_once ROOT_PATH . 'lib/' . $sPath;
-            return true;
-        }
-    }
-);
-
 
 
 class LOVD_API
