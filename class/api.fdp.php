@@ -92,26 +92,21 @@ class LOVD_API_FDP
             $aURLElements = array_diff($aURLElements, array(''));
         }
 
-        // Check URL structure.
-        if (!is_array($aURLElements)
-            || ($this->API->sResource == 'catalog' && count($aURLElements) != 1)
-            || ($this->API->sResource != 'catalog' && $aURLElements)) {
+        // Check URL structure and handle the request.
+        // We receive all FDP endpoints here.
+        if (!$this->API->sResource && !$aURLElements) {
+            return $this->showFDP();
+        } elseif ($this->API->sResource == 'catalogs' && !$aURLElements) {
+            // Return just the catalogs; unset the FAIRDataPoint data.
+            return ($this->showFDP() && array_shift($this->API->aResponse['@graph']));
+        } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 1) {
+            // Return just one catalog, possibly containing datasets or distributions.
+            return $this->showFDPCatalog($aURLElements[0]);
+        } else {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
             $this->API->aResponse['errors'][] = 'Could not parse the given request.';
             return false;
-        }
-
-        // Now actually handle the request.
-        // We receive all FDP endpoints here.
-        if (!$this->API->sResource) {
-            return $this->showFDP();
-        } elseif ($this->API->sResource == 'catalogs') {
-            // Return just the catalogs; unset the FAIRDataPoint data.
-            return ($this->showFDP() && array_shift($this->API->aResponse['@graph']));
-        } elseif ($this->API->sResource == 'catalog') {
-            // Return just one catalog, possibly containing datasets or distributions.
-            return $this->showFDPCatalog($aURLElements[0]);
         }
 
         // If we end up here, we didn't handle the request well.
