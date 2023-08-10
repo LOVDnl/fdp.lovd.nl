@@ -211,6 +211,22 @@ class LOVD_API_FDP
             return true;
         }
 
+        // Fetch data from varcache.
+        $aLOVD = array();
+        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes');
+        if ($aJSONResponse !== false) {
+            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+            if ($aJSONResponse !== false) {
+                $aLOVD = $aJSONResponse;
+            }
+        }
+
+        if (!$aLOVD) {
+            // Somehow, we couldn't fetch data from Varcache.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
             // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
@@ -219,8 +235,8 @@ class LOVD_API_FDP
                 [
                     '@id' => lovd_getInstallURL() . CURRENT_PATH,
                     '@type' => 'http://www.w3.org/ns/dcat#Catalog',
-                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) instance',
-                    'http://purl.org/dc/terms/description' => 'This catalog lists the metadata for the public LOVD instance.',
+                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) instance at ' . $aLOVD['url'],
+                    'http://purl.org/dc/terms/description' => 'This catalog lists the metadata for the public LOVD instance at ' . $aLOVD['url'] . '.',
                     'http://purl.org/dc/terms/publisher' => [
                         '@id' => lovd_getInstallURL() . '#publisher',
                         '@type' => 'http://xmlns.com/foaf/0.1/Agent',
@@ -239,12 +255,13 @@ class LOVD_API_FDP
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c'), // FIXME: Measure from Varcache tables?
                     ],
+                    'http://xmlns.com/foaf/0.1/homepage' => $aLOVD['url'],
                     'http://www.w3.org/ns/dcat#dataset' => [],
                 ],
                 [
                     '@id' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/datasets',
                     '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
-                    'http://purl.org/dc/terms/title' => 'Datasets',
+                    'http://purl.org/dc/terms/title' => 'Datasets as at ' . $aLOVD['url'],
                     'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa'),
                     'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://www.w3.org/ns/dcat#dataset',
                     'http://www.w3.org/ns/ldp#contains' => [],
