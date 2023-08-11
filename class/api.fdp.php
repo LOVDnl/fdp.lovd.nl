@@ -277,5 +277,52 @@ class LOVD_API_FDP
 
         return true;
     }
+
+
+
+
+
+    private function showFDPDataset ($sUUID, $sGene)
+    {
+        // Shows one of the FDP's catalog's datasets (a gene).
+
+        // First, check if the LOVD exist.
+        if (!isset($this->aLOVDs[$sUUID])) {
+            // LOVD does not exist.
+            $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
+            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // Fetch data from varcache.
+        $aLOVD = array();
+        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes/' . $sGene);
+        if ($aJSONResponse !== false) {
+            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+            if ($aJSONResponse !== false) {
+                $aLOVD = $aJSONResponse;
+            }
+        }
+
+        if (!$aLOVD) {
+            // Somehow, we couldn't fetch data from Varcache.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // But does the gene exists?
+        if (!isset($aLOVD['genes']) || !$aLOVD['genes']) {
+            // Genes array doesn't exist (shouldn't happen!), or it's empty. Gene does not exist.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID, dataset $sGene.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // For HEAD requests, we're done here.
+        if (!$this->bReturnBody) {
+            $this->API->sendHeader(200, true); // Send HTTP status code, print response, and quit.
+            return true;
+        }
+
+        return true;
+    }
 }
 ?>
