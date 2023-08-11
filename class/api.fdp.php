@@ -41,7 +41,11 @@ class LOVD_API_FDP
 
     private $API;                     // The API object.
     private $bReturnBody = true;      // Return the body? false for HEAD requests.
-    private $aLOVDs = array();
+    private $aLOVDs = [];
+    private $aDistributions = [
+        'html' => [],
+        'json/v2' => [],
+    ];
 
 
 
@@ -354,10 +358,7 @@ class LOVD_API_FDP
                         '@value' => date('c'), // FIXME: Measure from Varcache tables?
                     ],
                     'http://xmlns.com/foaf/0.1/homepage' => $aLOVD['url'] . 'genes/' . $sGene,
-                    'http://www.w3.org/ns/dcat#distribution' => [
-                        lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/html',
-                        lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/json/v2',
-                    ],
+                    'http://www.w3.org/ns/dcat#distribution' => [],
                 ],
                 [
                     '@id' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene . '/distributions',
@@ -370,6 +371,9 @@ class LOVD_API_FDP
             ],
         ];
 
+        foreach (array_keys($this->aDistributions) as $sID) {
+            $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'][] = lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/' . $sID;
+        }
         $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'];
 
         return true;
