@@ -83,6 +83,8 @@ class LOVD_API_FDP
 
     private function checkIfLOVDExistsOrDie ($sUUID)
     {
+        // Checks if the LOVD is known to us; returns a fatal error otherwise.
+
         if (!isset($this->aLOVDs[$sUUID])) {
             // LOVD does not exist.
             $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
@@ -344,7 +346,7 @@ class LOVD_API_FDP
                     '@id' => lovd_getInstallURL() . CURRENT_PATH,
                     '@type' => 'http://www.w3.org/ns/dcat#Dataset',
                     'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) instance at ' . $aLOVD['url'] . ', dataset ' . $sGene,
-                    'http://purl.org/dc/terms/description' => 'This catalog lists the metadata for the ' . $sGene . ' gene in the public LOVD instance at ' . $aLOVD['url'] . '.',
+                    'http://purl.org/dc/terms/description' => 'This dataset lists the metadata for the ' . $sGene . ' gene in the public LOVD instance at ' . $aLOVD['url'] . '.',
                     'http://purl.org/dc/terms/publisher' => [
                         '@id' => lovd_getInstallURL() . '#publisher',
                         '@type' => 'http://xmlns.com/foaf/0.1/Agent',
@@ -377,8 +379,8 @@ class LOVD_API_FDP
             ],
         ];
 
-        foreach (array_keys($this->aDistributions) as $sID) {
-            $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'][] = lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/' . $sID;
+        foreach (array_keys($this->aDistributions) as $sDistribution) {
+            $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'][] = lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/' . $sDistribution;
         }
         $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'];
 
