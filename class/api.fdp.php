@@ -94,12 +94,13 @@ class LOVD_API_FDP
 
 
 
-    private function downloadFromVarcacheOrDie ($sUUID)
+    private function downloadFromVarcacheOrDie ($sUUID, $sGene = false)
     {
         // Downloads the LOVD data from Varcache; returns a fatal error otherwise.
 
         $aLOVD = array();
-        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes');
+        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes' .
+            (!$sGene? '' : '/' . $sGene));
         if ($aJSONResponse !== false) {
             $aJSONResponse = @json_decode(implode($aJSONResponse), true);
             if ($aJSONResponse !== false) {
@@ -110,6 +111,13 @@ class LOVD_API_FDP
         if (!$aLOVD) {
             // Somehow, we couldn't fetch data from Varcache.
             $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // But does the gene exist?
+        if ($sGene && (!isset($aLOVD['genes']) || !$aLOVD['genes'])) {
+            // Genes array doesn't exist (shouldn't happen!), or it's empty. Gene does not exist.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID, dataset $sGene.";
             $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
         }
 
@@ -319,27 +327,7 @@ class LOVD_API_FDP
         $this->checkIfLOVDExistsOrDie($sUUID);
 
         // Fetch data from varcache.
-        $aLOVD = array();
-        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes/' . $sGene);
-        if ($aJSONResponse !== false) {
-            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
-            if ($aJSONResponse !== false) {
-                $aLOVD = $aJSONResponse;
-            }
-        }
-
-        if (!$aLOVD) {
-            // Somehow, we couldn't fetch data from Varcache.
-            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
-            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
-        }
-
-        // But does the gene exists?
-        if (!isset($aLOVD['genes']) || !$aLOVD['genes']) {
-            // Genes array doesn't exist (shouldn't happen!), or it's empty. Gene does not exist.
-            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID, dataset $sGene.";
-            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
-        }
+        $aLOVD = $this->downloadFromVarcacheOrDie($sUUID, $sGene);
 
         // For HEAD requests, we're done here.
         if (!$this->bReturnBody) {
