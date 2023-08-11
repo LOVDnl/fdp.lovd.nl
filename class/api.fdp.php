@@ -108,6 +108,9 @@ class LOVD_API_FDP
         } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 3 && $aURLElements[1] == 'dataset') {
             // Return just one dataset; containing two distributions.
             return $this->showFDPDataset($aURLElements[0], $aURLElements[2]);
+        } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 4 && $aURLElements[1] == 'dataset' && $aURLElements[3] == 'distributions') {
+            // Return just the dataset's distributions; unset the dataset data.
+            return ($this->showFDPDataset($aURLElements[0], $aURLElements[2]) && array_shift($this->API->aResponse['@graph']));
         } else {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
