@@ -81,6 +81,19 @@ class LOVD_API_FDP
 
 
 
+    private function checkIfLOVDExistsOrDie ($sUUID)
+    {
+        if (!isset($this->aLOVDs[$sUUID])) {
+            // LOVD does not exist.
+            $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
+            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
+        }
+    }
+
+
+
+
+
     public function processGET ($aURLElements, $bReturnBody)
     {
         // Handle GET and HEAD requests for the FDP.
@@ -207,11 +220,7 @@ class LOVD_API_FDP
         // Shows one of the FDP's catalogs (an LOVD instance).
 
         // First, check if the LOVD exist.
-        if (!isset($this->aLOVDs[$sUUID])) {
-            // LOVD does not exist.
-            $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
-            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
-        }
+        $this->checkIfLOVDExistsOrDie($sUUID);
 
         // For HEAD requests, we're done here.
         if (!$this->bReturnBody) {
@@ -294,11 +303,7 @@ class LOVD_API_FDP
         // Shows one of the FDP's catalog's datasets (a gene).
 
         // First, check if the LOVD exist.
-        if (!isset($this->aLOVDs[$sUUID])) {
-            // LOVD does not exist.
-            $this->API->aResponse['errors'][] = 'The catalog you requested does not exist.';
-            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
-        }
+        $this->checkIfLOVDExistsOrDie($sUUID);
 
         // Fetch data from varcache.
         $aLOVD = array();
