@@ -94,6 +94,32 @@ class LOVD_API_FDP
 
 
 
+    private function downloadFromVarcacheOrDie ($sUUID)
+    {
+        // Downloads the LOVD data from Varcache; returns a fatal error otherwise.
+
+        $aLOVD = array();
+        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes');
+        if ($aJSONResponse !== false) {
+            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+            if ($aJSONResponse !== false) {
+                $aLOVD = $aJSONResponse;
+            }
+        }
+
+        if (!$aLOVD) {
+            // Somehow, we couldn't fetch data from Varcache.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
+        return $aLOVD;
+    }
+
+
+
+
+
     public function processGET ($aURLElements, $bReturnBody)
     {
         // Handle GET and HEAD requests for the FDP.
@@ -229,20 +255,7 @@ class LOVD_API_FDP
         }
 
         // Fetch data from varcache.
-        $aLOVD = array();
-        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes');
-        if ($aJSONResponse !== false) {
-            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
-            if ($aJSONResponse !== false) {
-                $aLOVD = $aJSONResponse;
-            }
-        }
-
-        if (!$aLOVD) {
-            // Somehow, we couldn't fetch data from Varcache.
-            $this->API->aResponse['errors'][] = "Could not fetch remote data for catalog $sUUID.";
-            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
-        }
+        $aLOVD = $this->downloadFromVarcacheOrDie($sUUID);
 
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
