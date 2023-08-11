@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-10   // When modified, also change the library_version.
+ * Modified    : 2023-08-11   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -55,7 +55,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-10';
+        $this->API->aResponse['library_version'] = '2023-08-11';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -100,11 +100,14 @@ class LOVD_API_FDP
             // Return just the catalogs; unset the FAIRDataPoint data.
             return ($this->showFDP() && array_shift($this->API->aResponse['@graph']));
         } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 1) {
-            // Return just one catalog, possibly containing datasets or distributions.
+            // Return just one catalog, possibly containing datasets.
             return $this->showFDPCatalog($aURLElements[0]);
         } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 2 && $aURLElements[1] == 'datasets') {
             // Return just the catalog's datasets; unset the catalog data.
             return ($this->showFDPCatalog($aURLElements[0]) && array_shift($this->API->aResponse['@graph']));
+        } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 3 && $aURLElements[1] == 'dataset') {
+            // Return just one dataset; containing two distributions.
+            return $this->showFDPDataset($aURLElements[0], $aURLElements[2]);
         } else {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
@@ -194,7 +197,7 @@ class LOVD_API_FDP
 
     private function showFDPCatalog ($sUUID)
     {
-        // Shows one of the FDP's catalogs.
+        // Shows one of the FDP's catalogs (an LOVD instance).
 
         // First, check if the LOVD exist.
         if (!isset($this->aLOVDs[$sUUID])) {
@@ -228,7 +231,7 @@ class LOVD_API_FDP
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
             // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
-            // In this case, the FDP node and the catalogs node.
+            // In this case, the catalog's node and the datasets node.
             '@graph' => [
                 [
                     '@id' => lovd_getInstallURL() . CURRENT_PATH,
