@@ -43,8 +43,16 @@ class LOVD_API_FDP
     private $bReturnBody = true;      // Return the body? false for HEAD requests.
     private $aLOVDs = [];
     private $aDistributions = [
-        'html' => [],
-        'json/v2' => [],
+        'html' => [
+            'title' => 'Web interface',
+            'type' => 'dcat:accessURL',
+            'url' => 'genes/{{GENE}}',
+        ],
+        'json/v2' => [
+            'title' => 'LOVD2-style JSON API',
+            'type' => 'dcat:downloadURL',
+            'url' => 'api/rest/variants/{{GENE}}?format=application/json',
+        ],
     ];
 
 
@@ -419,6 +427,38 @@ class LOVD_API_FDP
             return true;
         }
 
+        // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
+        $this->API->aResponse = [
+            // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
+            // In this case, the distribution's node.
+            '@graph' => [
+                [
+                    '@id' => lovd_getInstallURL() . CURRENT_PATH,
+                    '@type' => 'http://www.w3.org/ns/dcat#Distribution',
+                    'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) instance at ' . $aLOVD['url'] . ', dataset ' . $sGene . ', the ' . $this->aDistributions[$sDistribution]['title'],
+                    'http://purl.org/dc/terms/description' => 'This distribution lists the metadata for the ' . $this->aDistributions[$sDistribution]['title'] . ' of the ' . $sGene . ' gene in the public LOVD instance at ' . $aLOVD['url'] . '.',
+                    'http://purl.org/dc/terms/publisher' => [
+                        '@id' => lovd_getInstallURL() . '#publisher',
+                        '@type' => 'http://xmlns.com/foaf/0.1/Agent',
+                        'http://xmlns.com/foaf/0.1/name' => 'Leiden Open Variation Database',
+                        'http://xmlns.com/foaf/0.1/homepage' => 'https://lovd.nl',
+                    ],
+                    'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+                    'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
+                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene,
+                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
+                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => '2023-08-03T15:38:19+02:00',
+                    ],
+                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                        '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                        '@value' => date('c'),
+                    ],
+                    str_replace('dcat:', 'http://www.w3.org/ns/dcat#', $this->aDistributions[$sDistribution]['type']) => $aLOVD['url'] . str_replace('{{GENE}}', $sGene, $this->aDistributions[$sDistribution]['url']),
+                ],
+            ],
+        ];
         return true;
     }
 }
