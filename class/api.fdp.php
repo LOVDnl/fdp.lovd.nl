@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-11   // When modified, also change the library_version.
+ * Modified    : 2023-08-14   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -59,7 +59,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-11';
+        $this->API->aResponse['library_version'] = '2023-08-14';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -164,6 +164,11 @@ class LOVD_API_FDP
         } elseif ($this->API->sResource == 'catalog' && count($aURLElements) == 4 && $aURLElements[1] == 'dataset' && $aURLElements[3] == 'distributions') {
             // Return just the dataset's distributions; unset the dataset data.
             return ($this->showFDPDataset($aURLElements[0], $aURLElements[2]) && array_shift($this->API->aResponse['@graph']));
+        } elseif ($this->API->sResource == 'catalog' && count($aURLElements) >= 5 && $aURLElements[1] == 'dataset' && $aURLElements[3] == 'distribution') {
+            // Return just one distribution.
+            // A distribution can be made out of multiple URL elements (e.g., "json/v2"). Take the whole string.
+            $sDistribution = implode('/', array_slice($aURLElements, 4));
+            return $this->showFDPDistribution($aURLElements[0], $aURLElements[2], $sDistribution);
         } else {
             // Something invalid happened.
             $this->API->nHTTPStatus = 400; // Send 400 Bad Request.
@@ -383,6 +388,36 @@ class LOVD_API_FDP
             $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'][] = lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distribution/' . $sDistribution;
         }
         $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://www.w3.org/ns/dcat#distribution'];
+
+        return true;
+    }
+
+
+
+
+
+    private function showFDPDistribution ($sUUID, $sGene, $sDistribution)
+    {
+        // Shows one of the FDP's catalog's dataset's distributions (an interface).
+
+        // First, check if the LOVD exist.
+        $this->checkIfLOVDExistsOrDie($sUUID);
+
+        // Fetch data from varcache.
+        $aLOVD = $this->downloadFromVarcacheOrDie($sUUID, $sGene);
+
+        // And does the distribution exist?
+        if (!isset($this->aDistributions[$sDistribution])) {
+            // Nope, distribution is unknown.
+            $this->API->aResponse['errors'][] = 'The distribution you requested does not exist.';
+            $this->API->sendHeader(404, true); // Send HTTP status code, print response, and quit.
+        }
+
+        // For HEAD requests, we're done here.
+        if (!$this->bReturnBody) {
+            $this->API->sendHeader(200, true); // Send HTTP status code, print response, and quit.
+            return true;
+        }
 
         return true;
     }
