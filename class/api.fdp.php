@@ -105,6 +105,33 @@ class LOVD_API_FDP
 
 
 
+    private function downloadFromLOVDOrDie ($sURL, $sGene)
+    {
+        // Downloads the gene's data from the LOVD API; returns a fatal error otherwise.
+
+        // FIXME: Set a short timeout?
+        $aGene = array();
+        $aJSONResponse = @lovd_php_file($sURL . 'api/rest/genes/' . $sGene . '?format=application/json');
+        if ($aJSONResponse !== false) {
+            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+            if ($aJSONResponse !== false) {
+                $aGene = $aJSONResponse;
+            }
+        }
+
+        if (!$aGene) {
+            // Somehow, we couldn't fetch data from the LOVD.
+            $this->API->aResponse['errors'][] = "Could not fetch remote data for the $sGene gene at $sURL.";
+            $this->API->sendHeader(500, true); // Send HTTP status code, print response, and quit.
+        }
+
+        return $aGene;
+    }
+
+
+
+
+
     private function downloadFromVarcacheOrDie ($sUUID, $sGene = false)
     {
         // Downloads the LOVD data from Varcache; returns a fatal error otherwise.
