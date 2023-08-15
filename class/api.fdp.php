@@ -54,6 +54,7 @@ class LOVD_API_FDP
             'url' => 'api/rest/variants/{{GENE}}?format=application/json',
         ],
     ];
+    private $sEpoch = '2023-08-03T15:38:19+02:00';
 
 
 
@@ -231,7 +232,7 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => '2023-08-03T15:38:19+02:00',
+                        '@value' => $this->sEpoch,
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
@@ -302,7 +303,7 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => '2023-08-03T15:38:19+02:00', // This is the time the FDP was launched. All instances we share are older than this.
+                        '@value' => $this->sEpoch, // This is the time the FDP was launched. All instances we share are older than this.
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
@@ -372,7 +373,7 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => '2023-08-03T15:38:19+02:00', // FIXME: Should be retrieved from Varcache.
+                        '@value' => $this->sEpoch, // FIXME: Should be retrieved from Varcache.
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
@@ -449,7 +450,7 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => '2023-08-03T15:38:19+02:00',
+                        '@value' => $this->sEpoch,
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
