@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-14   // When modified, also change the library_version.
+ * Modified    : 2023-08-15   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -67,7 +67,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-14';
+        $this->API->aResponse['library_version'] = '2023-08-15';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -302,11 +302,11 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => '2023-08-03T15:38:19+02:00',
+                        '@value' => '2023-08-03T15:38:19+02:00', // This is the time the FDP was launched. All instances we share are older than this.
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => date('c'), // FIXME: Measure from Varcache tables?
+                        '@value' => date('c', strtotime($aLOVD['updated_date'])),
                     ],
                     'http://xmlns.com/foaf/0.1/homepage' => $aLOVD['url'],
                     'http://www.w3.org/ns/dcat#dataset' => [],
