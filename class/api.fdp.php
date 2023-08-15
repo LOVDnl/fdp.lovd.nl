@@ -458,6 +458,9 @@ class LOVD_API_FDP
             return true;
         }
 
+        // Now also fetch some data directly from this LOVD.
+        $aGene = $this->downloadFromLOVDOrDie($aLOVD['url'], $sGene);
+
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
             // Unnamed (default) graph, as no '@id' is specified here. A graph of all nodes.
@@ -480,11 +483,11 @@ class LOVD_API_FDP
                     'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'http://purl.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => $this->sEpoch,
+                        '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['created_date']))), // The epoch or the gene's creation date, whatever came last.
                     ],
                     'http://purl.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
-                        '@value' => date('c'),
+                        '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['updated_date']))), // The epoch or the gene's modification date, whatever came last.
                     ],
                     str_replace('dcat:', 'http://www.w3.org/ns/dcat#', $this->aDistributions[$sDistribution]['type']) => $aLOVD['url'] . str_replace('{{GENE}}', $sGene, $this->aDistributions[$sDistribution]['url']),
                 ],
