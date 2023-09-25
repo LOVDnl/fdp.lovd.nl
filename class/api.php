@@ -5,7 +5,7 @@
  * Adapted from /src/class/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-10   // When modified, also change the library_version.
+ * Modified    : 2023-09-26   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -422,11 +422,11 @@ class LOVD_API
 
                 // Two fields that we have to handle separately.
                 $sID = $aGraph['@id'];
-                $sType = $aGraph['@type']; // We assume that @type is a string, not an array.
+                $aTypes = (is_array($aGraph['@type'])? $aGraph['@type'] : [$aGraph['@type']]);
                 unset($aGraph['@id'], $aGraph['@type']);
                 $sResponse .= (!$nKey? '' : "\n") .
                     ($sID[0] == '_'? $sID : '<' . $sID . '>') .
-                    ' a <' . $sType . '>;' . "\n";
+                    ' a <' . implode(">,\n    <", $aTypes) . '>;' . "\n";
 
                 // Now handle the rest.
                 foreach ($aGraph as $sProperty => $Value) {
