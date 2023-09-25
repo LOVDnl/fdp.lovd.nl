@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-08-15   // When modified, also change the library_version.
+ * Modified    : 2023-09-26   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -68,7 +68,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-08-15';
+        $this->API->aResponse['library_version'] = '2023-09-26';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -237,7 +237,11 @@ class LOVD_API_FDP
             '@graph' => [
                 [
                     '@id' => lovd_getInstallURL(),
-                    '@type' => 'http://purl.org/fdp/fdp-o#FAIRDataPoint',
+                    '@type' => [
+                        'http://purl.org/fdp/fdp-o#FAIRDataPoint', // Required by the specs.
+                        'http://purl.org/fdp/fdp-o#MetadataService', // I am told it's required by the harvester.
+                        'http://www.w3.org/ns/dcat#Resource', // Data suggests it's required by the harvester.
+                    ],
                     'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) FAIR Data Point (FDP)',
                     'http://purl.org/dc/terms/description' => 'This FAIR Data Point lists public LOVD instances and some of their metadata.',
                     'http://purl.org/dc/terms/publisher' => [
