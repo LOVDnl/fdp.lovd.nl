@@ -166,6 +166,32 @@ class LOVD_API_FDP
 
 
 
+    private function loadCacheFile ($sCacheFile, $nMaximumAgeInDays)
+    {
+        // Loads a cached file, if present, and if not older than $nMaximumAgeInDays.
+
+        $sCacheFile = CACHE_PATH . $sCacheFile;
+        if (file_exists($sCacheFile)) {
+            $aFileStats = stat($sCacheFile);
+            if (isset($aFileStats['mtime'])
+                && (time() - $aFileStats['mtime']) < (60*60*24*$nMaximumAgeInDays)) {
+                $sJSON = file_get_contents($sCacheFile);
+                $aJSON = @json_decode($sJSON, true);
+                if ($aJSON !== false) {
+                    return $aJSON;
+                }
+            }
+        }
+
+        // If we get here, the loading of the file failed. The reason is not really important. It could not exist, it
+        //  could be too old, or it could not be parseable. Nonetheless, we will return false.
+        return false;
+    }
+
+
+
+
+
     public function processGET ($aURLElements, $bReturnBody)
     {
         // Handle GET and HEAD requests for the FDP.
