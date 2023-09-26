@@ -5,7 +5,7 @@
  * Adapted from /src/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-08-09   // When modified, also change the library_version.
+ * Modified    : 2023-09-26   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Supported URIs (/v# is optional):
@@ -36,6 +36,7 @@
  *************/
 
 define('ROOT_PATH', './');
+define('CACHE_PATH', './cache/');
 require ROOT_PATH . 'inc-init.php';
 require ROOT_PATH . 'class/api.php';
 
