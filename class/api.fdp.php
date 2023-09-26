@@ -246,6 +246,26 @@ class LOVD_API_FDP
 
 
 
+    private function saveCacheFile ($sCacheFile, $aData)
+    {
+        // Saves a cached file, possibly overwriting an existing file.
+
+        if (!file_exists(CACHE_PATH)) {
+            @mkdir(CACHE_PATH);
+        }
+        if (!is_dir(CACHE_PATH) || !is_writable(CACHE_PATH)) {
+            return false;
+        }
+
+        $sCacheFile = CACHE_PATH . $sCacheFile;
+        $sJSON = json_encode($aData);
+        return file_put_contents($sCacheFile, $sJSON, LOCK_EX);
+    }
+
+
+
+
+
     private function showFDP ()
     {
         // Shows the FDP output.
