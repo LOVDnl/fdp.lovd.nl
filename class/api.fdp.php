@@ -149,9 +149,9 @@ class LOVD_API_FDP
                 $aJSONResponse = @json_decode(implode($aJSONResponse), true);
                 if ($aJSONResponse !== false) {
                     $aLOVD = $aJSONResponse;
-                    if ($aLOVD) {
-                        $this->saveCacheFile($sCacheFile, $aLOVD);
-                    }
+                    // We could just cache the retrieved string, but varcache
+                    //  pretty-prints the data, wasting a lot of space.
+                    $this->saveCacheFile($sCacheFile, $aLOVD);
                 }
             }
         }
@@ -256,7 +256,7 @@ class LOVD_API_FDP
 
 
 
-    private function saveCacheFile ($sCacheFile, $aData)
+    private function saveCacheFile ($sCacheFile, $Data)
     {
         // Saves a cached file, possibly overwriting an existing file.
 
@@ -268,8 +268,10 @@ class LOVD_API_FDP
         }
 
         $sCacheFile = CACHE_PATH . $sCacheFile;
-        $sJSON = json_encode($aData);
-        return file_put_contents($sCacheFile, $sJSON, LOCK_EX);
+        if (!is_string($Data)) {
+            $Data = json_encode($Data, JSON_UNESCAPED_SLASHES);
+        }
+        return file_put_contents($sCacheFile, $Data, LOCK_EX);
     }
 
 
