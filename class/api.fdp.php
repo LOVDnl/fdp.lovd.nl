@@ -109,13 +109,22 @@ class LOVD_API_FDP
     {
         // Downloads the gene's data from the LOVD API; returns a fatal error otherwise.
 
-        // FIXME: Set a short timeout?
-        $aGene = array();
-        $aJSONResponse = @lovd_php_file($sURL . 'api/rest/genes/' . $sGene . '?format=application/json');
-        if ($aJSONResponse !== false) {
-            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+        // Cache this request, as for every ping to the index, our entire FDP will be crawled.
+        $sCacheFile = $sUUID . '.' . $sGene . '.lovd.json';
+        // Load the data from the cache, unless it's 14 days old or older.
+        $aGene = $this->loadCacheFile($sCacheFile, 14);
+
+        if (!$aGene) {
+            // Re-fetch it from LOVD.
+            $aJSONResponse = @lovd_php_file($sURL . 'api/rest/genes/' . $sGene . '?format=application/json');
             if ($aJSONResponse !== false) {
-                $aGene = $aJSONResponse;
+                $sJSONResponse = implode($aJSONResponse);
+                $aJSONResponse = @json_decode($sJSONResponse, true);
+                if ($aJSONResponse !== false) {
+                    $aGene = $aJSONResponse;
+                    // LOVD provides clean JSON; store it simply as it's been received.
+                    $this->saveCacheFile($sCacheFile, $sJSONResponse);
+                }
             }
         }
 
