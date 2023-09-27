@@ -305,8 +305,8 @@ class LOVD_API_FDP
                 [
                     '@id' => lovd_getInstallURL(),
                     '@type' => [
-                        'http://purl.org/fdp/fdp-o#FAIRDataPoint', // Required by the specs.
-                        'http://purl.org/fdp/fdp-o#MetadataService', // I am told it's required by the harvester.
+                        'https://w3id.org/fdp/fdp-o#FAIRDataPoint', // Required by the specs.
+                        'https://w3id.org/fdp/fdp-o#MetadataService', // I am told it's required by the harvester.
                         'http://www.w3.org/ns/dcat#Resource', // Data suggests it's required by the harvester.
                     ],
                     'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) FAIR Data Point (FDP)',
@@ -327,34 +327,34 @@ class LOVD_API_FDP
                         'http://www.w3.org/2006/vcard/ns#hasURL' => 'https://lovd.nl/contact',
                     ],
                     'http://www.w3.org/ns/dcat#endpointURL' => lovd_getInstallURL(),
-                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . '#identifier',
-                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                    'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . '#identifier',
+                    'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => $this->sEpoch,
                     ],
-                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                    'https://w3id.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c'),
                     ],
-                    'http://purl.org/fdp/fdp-o#hasSoftwareVersion' => $this->API->aResponse['library_version'],
-                    'http://purl.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/',
-                    'http://purl.org/fdp/fdp-o#metadataCatalog' => [],
+                    'https://w3id.org/fdp/fdp-o#hasSoftwareVersion' => $this->API->aResponse['library_version'],
+                    'https://w3id.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/',
+                    'https://w3id.org/fdp/fdp-o#metadataCatalog' => [],
                 ],
                 [
                     '@id' => lovd_getInstallURL() . 'catalogs/',
                     '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
                     'http://purl.org/dc/terms/title' => 'Leiden Open Variation Database (LOVD) Catalogs',
                     'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL(),
-                    'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://purl.org/fdp/fdp-o#metadataCatalog',
+                    'http://www.w3.org/ns/ldp#hasMemberRelation' => 'https://w3id.org/fdp/fdp-o#metadataCatalog',
                     'http://www.w3.org/ns/ldp#contains' => [],
                 ],
             ],
         ];
 
         foreach (array_keys($this->aLOVDs) as $sUUID) {
-            $this->API->aResponse['@graph'][0]['http://purl.org/fdp/fdp-o#metadataCatalog'][] = lovd_getInstallURL() . 'catalog/' . $sUUID;
+            $this->API->aResponse['@graph'][0]['https://w3id.org/fdp/fdp-o#metadataCatalog'][] = lovd_getInstallURL() . 'catalog/' . $sUUID;
         }
-        $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['http://purl.org/fdp/fdp-o#metadataCatalog'];
+        $this->API->aResponse['@graph'][1]['http://www.w3.org/ns/ldp#contains'] = $this->API->aResponse['@graph'][0]['https://w3id.org/fdp/fdp-o#metadataCatalog'];
 
         return true;
     }
@@ -398,12 +398,12 @@ class LOVD_API_FDP
                     'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
                     'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
                     'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL(),
-                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
-                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                    'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
+                    'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => $this->sEpoch, // This is the time the FDP was launched. All instances we share are older than this.
                     ],
-                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                    'https://w3id.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c', strtotime($aLOVD['updated_date'])),
                     ],
@@ -471,12 +471,12 @@ class LOVD_API_FDP
                     'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
                     'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
                     'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa'),
-                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
-                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                    'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
+                    'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['created_date']))), // The epoch or the gene's creation date, whatever came last.
                     ],
-                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                    'https://w3id.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['updated_date']))), // The epoch or the gene's modification date, whatever came last.
                     ],
@@ -551,12 +551,12 @@ class LOVD_API_FDP
                     'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
                     'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
                     'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene,
-                    'http://purl.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
-                    'http://purl.org/fdp/fdp-o#metadataIssued' => [
+                    'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
+                    'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['created_date']))), // The epoch or the gene's creation date, whatever came last.
                     ],
-                    'http://purl.org/fdp/fdp-o#metadataModified' => [
+                    'https://w3id.org/fdp/fdp-o#metadataModified' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
                         '@value' => date('c', max(strtotime($this->sEpoch), strtotime($aGene['updated_date']))), // The epoch or the gene's modification date, whatever came last.
                     ],
