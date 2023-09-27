@@ -137,7 +137,7 @@ class LOVD_API_FDP
         // Downloads the LOVD data from Varcache; returns a fatal error otherwise.
 
         // Cache this request, as for every ping to the index, our entire FDP will be crawled.
-        $sCacheFile = $sUUID . (!$sGene? '' : '.' . $sGene) . '.json';
+        $sCacheFile = $sUUID . (!$sGene? '' : '.' . $sGene) . '.varcache.json';
         // Load the data from the cache, unless it's 14 days old or older.
         $aLOVD = $this->loadCacheFile($sCacheFile, 14);
 
