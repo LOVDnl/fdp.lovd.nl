@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-09-26   // When modified, also change the library_version.
+ * Modified    : 2023-09-27   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -68,7 +68,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-09-26';
+        $this->API->aResponse['library_version'] = '2023-09-27';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -136,13 +136,23 @@ class LOVD_API_FDP
     {
         // Downloads the LOVD data from Varcache; returns a fatal error otherwise.
 
-        $aLOVD = array();
-        $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes' .
-            (!$sGene? '' : '/' . $sGene));
-        if ($aJSONResponse !== false) {
-            $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+        // Cache this request, as for every ping to the index, our entire FDP will be crawled.
+        $sCacheFile = $sUUID . (!$sGene? '' : '.' . $sGene) . '.json';
+        // Load the data from the cache, unless it's 14 days old or older.
+        $aLOVD = $this->loadCacheFile($sCacheFile, 14);
+
+        if (!$aLOVD) {
+            // Re-fetch it from varcache.
+            $aJSONResponse = @lovd_php_file('https://varcache.lovd.nl/api/locations/' . $this->aLOVDs[$sUUID] . '/genes' .
+                (!$sGene? '' : '/' . $sGene));
             if ($aJSONResponse !== false) {
-                $aLOVD = $aJSONResponse;
+                $aJSONResponse = @json_decode(implode($aJSONResponse), true);
+                if ($aJSONResponse !== false) {
+                    $aLOVD = $aJSONResponse;
+                    if ($aLOVD) {
+                        $this->saveCacheFile($sCacheFile, $aLOVD);
+                    }
+                }
             }
         }
 
