@@ -105,7 +105,7 @@ class LOVD_API_FDP
 
 
 
-    private function downloadFromLOVDOrDie ($sURL, $sGene)
+    private function downloadFromLOVDOrDie ($sUUID, $sURL, $sGene)
     {
         // Downloads the gene's data from the LOVD API; returns a fatal error otherwise.
 
@@ -441,7 +441,7 @@ class LOVD_API_FDP
         }
 
         // Now also fetch some data directly from this LOVD.
-        $aGene = $this->downloadFromLOVDOrDie($aLOVD['url'], $sGene);
+        $aGene = $this->downloadFromLOVDOrDie($sUUID, $aLOVD['url'], $sGene);
 
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
@@ -521,7 +521,7 @@ class LOVD_API_FDP
         }
 
         // Now also fetch some data directly from this LOVD.
-        $aGene = $this->downloadFromLOVDOrDie($aLOVD['url'], $sGene);
+        $aGene = $this->downloadFromLOVDOrDie($sUUID, $aLOVD['url'], $sGene);
 
         // Create simplified array structure. The API code will later convert it to proper JSON-LD or TTL.
         $this->API->aResponse = [
