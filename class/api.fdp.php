@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-09-27   // When modified, also change the library_version.
+ * Modified    : 2023-10-11   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -72,9 +72,7 @@ class LOVD_API_FDP
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
-        $aLOVDs = array(
-            '53786324d4c6cf1d33a3e594a92591aa',
-        );
+        $aLOVDs = array(); // Here, your LOVD's unique ID can be filled in.
         $this->aLOVDs = array_combine(
             array_map(
                 [$this->API, 'generateUUIDFromLOVDID'],
