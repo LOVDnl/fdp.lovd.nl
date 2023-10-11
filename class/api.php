@@ -5,7 +5,7 @@
  * Adapted from /src/class/api.php in the LOVD3 project.
  *
  * Created     : 2023-08-02
- * Modified    : 2023-09-26   // When modified, also change the library_version.
+ * Modified    : 2023-10-11   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -481,7 +481,11 @@ class LOVD_API
             $bPrettyPrint = (PHP_VERSION_ID >= 50400
                 && memory_get_usage() < 10000000
                 && (empty($this->aResponse['data']) || count($this->aResponse['data']) <= 10));
-            $sResponse = json_encode($this->aResponse, ($bPrettyPrint? JSON_PRETTY_PRINT : 0));
+            $bUnescapedSlashes = (PHP_VERSION_ID >= 50400);
+            $sResponse = json_encode(
+                $this->aResponse,
+                ($bPrettyPrint? JSON_PRETTY_PRINT : 0) | ($bUnescapedSlashes? JSON_UNESCAPED_SLASHES : 0)
+            );
         }
 
         return $sResponse;

@@ -68,7 +68,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-09-27';
+        $this->API->aResponse['library_version'] = '2023-10-11';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -276,7 +276,11 @@ class LOVD_API_FDP
 
         $sCacheFile = CACHE_PATH . $sCacheFile;
         if (!is_string($Data)) {
-            $Data = json_encode($Data, JSON_UNESCAPED_SLASHES);
+            $bUnescapedSlashes = (PHP_VERSION_ID >= 50400);
+            $Data = json_encode(
+                $Data,
+                ($bUnescapedSlashes? JSON_UNESCAPED_SLASHES : 0)
+            );
         }
         return file_put_contents($sCacheFile, $Data, LOCK_EX);
     }
