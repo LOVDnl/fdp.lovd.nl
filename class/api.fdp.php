@@ -339,7 +339,7 @@ class LOVD_API_FDP
                         '@value' => date('c'),
                     ],
                     'https://w3id.org/fdp/fdp-o#hasSoftwareVersion' => $this->API->aResponse['library_version'],
-                    'https://w3id.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/',
+                    'https://w3id.org/fdp/fdp-o#conformsToFdpSpec' => 'https://specs.fairdatapoint.org/fdp-specs-v1.2.html',
                     'https://w3id.org/fdp/fdp-o#metadataCatalog' => [],
                 ],
                 [
