@@ -6,13 +6,16 @@
  *
  * Created     : 2023-08-02
  * Modified    : 2023-09-26   // When modified, also change the library_version.
- * For LOVD    : 3.0-29
  *
  * Supported URIs (/v# is optional):
- *  3.0-29 (v1)  /v#/                        (GET/HEAD)
- *  3.0-29 (v1)  /v#/catalogs                (GET/HEAD)
- *  3.0-29 (v1)  /v#/catalog/<UUID>          (GET/HEAD)
- *  3.0-29 (v1)  /v#/catalog/<UUID>/datasets (GET/HEAD)
+ * - v1  /v#/                                                    (GET/HEAD)
+ * - v1  /v#/catalogs                                            (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>                                      (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>/datasets                             (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>/dataset/<GENE>                       (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>/dataset/<GENE>/distributions         (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>/dataset/<GENE>/distribution/html     (GET/HEAD)
+ * - v1  /v#/catalog/<UUID>/dataset/<GENE>/distribution/json/v2  (GET/HEAD)
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
  * Programmer  : Ivo F.A.C. Fokkema <I.F.A.C.Fokkema@LUMC.nl>

@@ -6,7 +6,6 @@
  *
  * Created     : 2023-08-02
  * Modified    : 2023-10-11   // When modified, also change the library_version.
- * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
  * Programmer  : Ivo F.A.C. Fokkema <I.F.A.C.Fokkema@LUMC.nl>
@@ -56,7 +55,7 @@ class LOVD_API
         'errors' => array(),
         'data' => array(),
     );
-    public $nHTTPStatus = 0;   // The HTTP status that should be send back to the user.
+    public $nHTTPStatus = 0;   // The HTTP status that should be sent back to the user.
     public $aHTTPHeaders = array(); // The HTTP response headers to send.
 
     // Currently supported resources (resource => array(methods)):
