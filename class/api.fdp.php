@@ -4,7 +4,7 @@
  * LEIDEN OPEN VARIATION DATABASE (LOVD)
  *
  * Created     : 2023-08-03
- * Modified    : 2023-10-11   // When modified, also change the library_version.
+ * Modified    : 2024-09-23   // When modified, also change the library_version.
  * For LOVD    : 3.0-29
  *
  * Copyright   : 2004-2023 Leiden University Medical Center; http://www.LUMC.nl/
@@ -68,7 +68,7 @@ class LOVD_API_FDP
             return false;
         }
         $this->API = $oAPI;
-        $this->API->aResponse['library_version'] = '2023-10-11';
+        $this->API->aResponse['library_version'] = '2024-09-23';
 
         // Fetch the LOVD data.
         // Currently, we just have a fixed list of LSDB IDs that we include here.
@@ -413,10 +413,10 @@ class LOVD_API_FDP
                     'http://www.w3.org/ns/dcat#dataset' => [],
                 ],
                 [
-                    '@id' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/datasets',
+                    '@id' => lovd_getInstallURL() . 'catalog/' . $sUUID . '/datasets',
                     '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
                     'http://purl.org/dc/terms/title' => 'Datasets as at ' . $aLOVD['url'],
-                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa'),
+                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $sUUID,
                     'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://www.w3.org/ns/dcat#dataset',
                     'http://www.w3.org/ns/ldp#contains' => [],
                 ],
@@ -472,7 +472,7 @@ class LOVD_API_FDP
                     ],
                     'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
                     'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
-                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa'),
+                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $sUUID,
                     'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
@@ -486,10 +486,10 @@ class LOVD_API_FDP
                     'http://www.w3.org/ns/dcat#distribution' => [],
                 ],
                 [
-                    '@id' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene . '/distributions',
+                    '@id' => lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene . '/distributions',
                     '@type' => 'http://www.w3.org/ns/ldp#DirectContainer',
                     'http://purl.org/dc/terms/title' => 'Distributions for the ' . $sGene . ' gene at ' . $aLOVD['url'],
-                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene,
+                    'http://www.w3.org/ns/ldp#membershipResource' => lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene,
                     'http://www.w3.org/ns/ldp#hasMemberRelation' => 'http://www.w3.org/ns/dcat#distribution',
                     'http://www.w3.org/ns/ldp#contains' => [],
                 ],
@@ -552,7 +552,7 @@ class LOVD_API_FDP
                     ],
                     'http://purl.org/dc/terms/language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
                     'http://purl.org/dc/terms/license' => 'http://purl.org/net/rdflicense/cc-by-sa4.0',
-                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $this->API->generateUUIDFromLOVDID('53786324d4c6cf1d33a3e594a92591aa') . '/dataset/' . $sGene,
+                    'http://purl.org/dc/terms/isPartOf' => lovd_getInstallURL() . 'catalog/' . $sUUID . '/dataset/' . $sGene,
                     'https://w3id.org/fdp/fdp-o#metadataIdentifier' => lovd_getInstallURL() . CURRENT_PATH . '#identifier',
                     'https://w3id.org/fdp/fdp-o#metadataIssued' => [
                         '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
